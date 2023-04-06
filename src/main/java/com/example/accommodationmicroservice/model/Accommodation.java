@@ -1,4 +1,4 @@
-package model;
+package com.example.accommodationmicroservice.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
