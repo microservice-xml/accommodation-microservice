@@ -1,4 +1,4 @@
-package controller;
+package com.example.accommodationmicroservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ExampleController {
 
     @GetMapping
-    public void ispisi()
+    public String ispisi()
     {
-        System.out.println("Hello");
+        return "Ok";
     }
 }
