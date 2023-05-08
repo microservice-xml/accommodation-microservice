@@ -30,4 +30,6 @@ public class Accommodation {
     private int minGuests;
     @Column(name = "maxGuests" , nullable = false)
     private int maxGuests;
+    @Column(name = "isAuto")
+    private boolean isAuto;
 }
