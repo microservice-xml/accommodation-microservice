@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -24,7 +26,7 @@ public class Accommodation {
     @Column(name = "location", nullable = false)
     private String location;
     @Column(name = "facilities", nullable = false)
-    private Facilities facilities;
+    private List<Facilities> facilities;
     @Column(name = "photo", nullable = false)
     private String photo;
     @Column(name = "minGuests" , nullable = false)
@@ -33,7 +35,7 @@ public class Accommodation {
     private int maxGuests;
     @Column(name = "availableBeds", nullable = false)
     private int availableBeds;
-    @Column(name = "accommodationGradeId", nullable = false)
+    @Column(name = "accommodationGradeId")
     private Long accommodationGradeId;
     @Column(name = "isAuto")
     private boolean isAuto;
