@@ -19,24 +19,24 @@ public class Accommodation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private Long id;
-    @Column(name = "name", nullable = false)
+    @Column(nullable = false)
     private String name;
-    @Column(name = "location", nullable = false)
+    @Column(nullable = false)
     private String location;
-    @Column(name = "facilities", nullable = false)
+    @Column(nullable = false)
     private List<Facilities> facilities;
-    @Column(name = "photo", nullable = false)
+    @Column(nullable = false)
     private String photo;
-    @Column(name = "minGuests" , nullable = false)
+    @Column(nullable = false)
     private int minGuests;
-    @Column(name = "maxGuests" , nullable = false)
+    @Column(nullable = false)
     private int maxGuests;
-    @Column(name = "availableBeds", nullable = false)
+    @Column(nullable = false)
     private int availableBeds;
-    @Column(name = "accommodationGradeId")
+    @Column
     private Long accommodationGradeId;
-    @Column(name = "isAuto")
+    @Column
     private boolean isAuto;
 }
