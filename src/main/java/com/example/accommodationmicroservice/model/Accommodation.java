@@ -1,7 +1,7 @@
 package com.example.accommodationmicroservice.model;
 
 import com.example.accommodationmicroservice.enums.Facilities;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,7 +26,7 @@ public class Accommodation {
     @Column(nullable = false)
     private String location;
     @Column(nullable = false)
-    private List<Facilities> facilities;
+    private String facilities;
     @Column(nullable = false)
     private String photo;
     @Column(nullable = false)
