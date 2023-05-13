@@ -28,6 +28,9 @@ public class AccommodationService {
     }
 
     public List<Accommodation> search(AccommodationSearchDto accommodationSearchDto) {
+        // fix bug where date with 1 day before is sent
+        accommodationSearchDto.setStart(accommodationSearchDto.getStart().plusDays(1));
+        accommodationSearchDto.setEnd(accommodationSearchDto.getEnd().plusDays(1));
         var accommodations = accommodationRepository.findAllByLocationIgnoreCaseAndMinGuestsLessThanEqualAndMaxGuestsGreaterThanEqual(accommodationSearchDto.getLocation(), accommodationSearchDto.getGuestCount(), accommodationSearchDto.getGuestCount());
         if (accommodations.size() == 0) {
             return new ArrayList<>();
