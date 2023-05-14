@@ -12,4 +12,6 @@ public interface AccommodationRepository extends JpaRepository<Accommodation, Lo
     List<Accommodation> findAllByLocationIgnoreCaseAndMinGuestsLessThanEqualAndMaxGuestsGreaterThanEqual(String location, int minGuests, int maxGuests);
 
     List<Accommodation> findByIdIn(List<Long> id);
+
+    List<Accommodation> findAllByUserId(Long userId);
 }

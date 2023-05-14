@@ -6,6 +6,7 @@ import "google/protobuf/timestamp.proto";
 
 service AccommodationService {
   rpc searchByAvailabilityRange(SearchRequest) returns (SearchResponse);
+  rpc findAllByUser(UserId) returns (ListAccommodation);
 }
 
 message SearchRequest {
@@ -20,4 +21,26 @@ message SearchRequest {
 
 message SearchResponse {
   repeated int64 accommodationIds = 1;
+}
+
+message UserId {
+  int64 userId = 1;
+}
+
+message AccommodationFull {
+  int64 id = 1;
+  string name = 2;
+  string location = 3;
+  string facilities = 4;
+  string photo = 5;
+  int32 minGuests = 6;
+  int32 maxGuests = 7;
+  int32 availableBeds = 8;
+  int64 accommodationGradeId = 9;
+  bool isAuto = 10;
+  int64 userId = 11;
+}
+
+message ListAccommodation {
+  repeated AccommodationFull accommodations = 1;
 }

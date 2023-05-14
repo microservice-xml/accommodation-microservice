@@ -39,4 +39,6 @@ public class Accommodation {
     private Long accommodationGradeId;
     @Column
     private boolean isAuto;
+    @Column
+    private Long userId;
 }

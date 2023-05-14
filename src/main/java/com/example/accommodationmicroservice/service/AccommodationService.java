@@ -55,4 +55,8 @@ public class AccommodationService {
         SearchResponse response = blockingStub.searchByAvailabilityRange(req);
         return accommodationRepository.findAllById(response.getAccommodationIdsList());
     }
+
+    public List<Accommodation> findAllByUser(long userId) {
+        return accommodationRepository.findAllByUserId(userId);
+    }
 }
