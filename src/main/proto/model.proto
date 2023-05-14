@@ -9,6 +9,7 @@ service AccommodationService {
   rpc findAllByUser(UserId) returns (ListAccommodation);
   rpc getReservation(UserIdRequest) returns (BooleanResponse);
   rpc addAccommodation(AccommodationFull) returns (MessageResponse);
+  rpc addAccommodationToReservation(AccommodationRes) returns (MessageResponse);
 }
 
 message SearchRequest {
@@ -27,6 +28,11 @@ message SearchResponse {
 
 message UserId {
   int64 userId = 1;
+}
+
+message AccommodationRes {
+  string city = 1;
+  uint64 accId = 2;
 }
 
 message AccommodationFull {

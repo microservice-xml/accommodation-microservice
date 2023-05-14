@@ -3,6 +3,8 @@ package com.example.accommodationmicroservice.service;
 import com.example.accommodationmicroservice.mapper.AccommodationMapper;
 import com.example.accommodationmicroservice.model.Accommodation;
 import communication.*;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -34,6 +36,7 @@ public class AccommodationGrpcService extends AccommodationServiceGrpc.Accommoda
                                  io.grpc.stub.StreamObserver<communication.MessageResponse> responseObserver) {
         Accommodation accommodation = AccommodationMapper.convertAccommodationGrpcToAccommodation(request);
         Accommodation acc = accommodationService.addAccommodation(accommodation);
+        sendAccommodationToReservation(acc);
         MessageResponse response;
         if(acc!=null)
             response = MessageResponse.newBuilder().setMessage("Accommodation created.").build();
@@ -42,6 +45,16 @@ public class AccommodationGrpcService extends AccommodationServiceGrpc.Accommoda
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+    }
+
+    private void sendAccommodationToReservation(Accommodation acc) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9095)
+                .usePlaintext()
+                .build();
+        AccommodationServiceGrpc.AccommodationServiceBlockingStub blockingStub =  AccommodationServiceGrpc.newBlockingStub(channel);
+        MessageResponse res = blockingStub.addAccommodationToReservation(AccommodationRes.newBuilder().setAccId(acc.getId()).setCity(acc.getLocation()).build());
+
+        System.out.println(res.getMessage());
     }
 
 }
