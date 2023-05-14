@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,5 +59,39 @@ public class AccommodationService {
 
     public List<Accommodation> findAllByUser(long userId) {
         return accommodationRepository.findAllByUserId(userId);
+    }
+
+    public communication.BooleanResponse CheckForDelete(Long userId) {
+        List<Accommodation> usersAccommodations = findAllByUser(userId);
+        if (usersAccommodations.size() == 0) {
+            return communication.BooleanResponse.newBuilder().setAvailable(true).build();
+        }
+        var accommodationIds = usersAccommodations.stream().map(Accommodation::getId).toList();
+
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9095)
+                .usePlaintext()
+                .build();
+        AccommodationServiceGrpc.AccommodationServiceBlockingStub blockingStub = AccommodationServiceGrpc.newBlockingStub(channel);
+
+        communication.CheckDeleteRequest request = communication.CheckDeleteRequest
+                .newBuilder()
+                .addAllAccommodationIds(accommodationIds)
+                .setStartYear(LocalDate.now().getYear())
+                .setStartMonth(LocalDate.now().getMonthValue())
+                .setStartDay(LocalDate.now().getDayOfMonth())
+                .build();
+        communication.BooleanResponse response = blockingStub.checkForDelete(request);
+
+        if (response.getAvailable()) {
+            deleteAccommodations(accommodationIds);
+        }
+
+        return response;
+    }
+
+    public void deleteAccommodations(List<Long> accommodationIds) {
+        for(Long accId : accommodationIds) {
+            accommodationRepository.deleteById(accId);
+        }
     }
 }

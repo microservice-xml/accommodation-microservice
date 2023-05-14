@@ -7,6 +7,11 @@ import "google/protobuf/timestamp.proto";
 service AccommodationService {
   rpc searchByAvailabilityRange(SearchRequest) returns (SearchResponse);
   rpc findAllByUser(UserId) returns (ListAccommodation);
+  rpc checkForDelete(CheckDeleteRequest) returns (BooleanResponse);
+}
+
+service UserAccommodationService {
+  rpc checkForDelete(UserIdRequest) returns (BooleanResponse);
 }
 
 message SearchRequest {
@@ -21,6 +26,13 @@ message SearchRequest {
 
 message SearchResponse {
   repeated int64 accommodationIds = 1;
+}
+
+message CheckDeleteRequest {
+  repeated int64 accommodationIds = 1;
+  int32 startYear = 2;
+  int32 startMonth = 3;
+  int32 startDay = 4;
 }
 
 message UserId {
@@ -43,4 +55,12 @@ message AccommodationFull {
 
 message ListAccommodation {
   repeated AccommodationFull accommodations = 1;
+}
+
+message UserIdRequest {
+  uint64 id = 1;
+}
+
+message BooleanResponse {
+  bool available = 1;
 }
