@@ -8,6 +8,7 @@ service AccommodationService {
   rpc searchByAvailabilityRange(SearchRequest) returns (SearchResponse);
   rpc findAllByUser(UserId) returns (ListAccommodation);
   rpc checkForDelete(CheckDeleteRequest) returns (BooleanResponse);
+  rpc search(SearchAccommodationDto) returns (ListAccommodation);
 }
 
 service UserAccommodationService {
@@ -63,4 +64,15 @@ message UserIdRequest {
 
 message BooleanResponse {
   bool available = 1;
+}
+
+message SearchAccommodationDto {
+  string location = 1;
+  int32 startYear = 2;
+  int32 startMonth = 3;
+  int32 startDay = 4;
+  int32 endYear = 5;
+  int32 endMonth = 6;
+  int32 endDay = 7;
+  int32 guestCount = 8;
 }
