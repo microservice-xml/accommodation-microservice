@@ -5,10 +5,14 @@ import com.example.accommodationmicroservice.model.Accommodation;
 import communication.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import com.example.accommodationmicroservice.dto.AccommodationSearchDto;
+import com.example.accommodationmicroservice.model.Accommodation;
+import communication.SearchAccommodationDto;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,13 +20,31 @@ import static com.example.accommodationmicroservice.mapper.AccommodationMapper.c
 
 @GrpcService
 @RequiredArgsConstructor
-public class AccommodationGrpcService extends AccommodationServiceGrpc.AccommodationServiceImplBase {
+public class AccommodationGrpcService extends communication.AccommodationServiceGrpc.AccommodationServiceImplBase {
     private final AccommodationService accommodationService;
 
     @Override
-    public void findAllByUser(UserId userId, StreamObserver<ListAccommodation> responseStreamObserver) {
+    public void findAllByUser(communication.UserId userId, StreamObserver<communication.ListAccommodation> responseStreamObserver) {
         var accommodations = accommodationService.findAllByUser(userId.getUserId());
-        List<AccommodationFull> accommodationFulls = new ArrayList<>();
+        List<communication.AccommodationFull> accommodationFulls = new ArrayList<>();
+        for (Accommodation a: accommodations) {
+            accommodationFulls.add(convertAccommodationToAccommodationGrpc(a));
+        }
+        var res = communication.ListAccommodation.newBuilder().addAllAccommodations(accommodationFulls).build();
+        responseStreamObserver.onNext(res);
+        responseStreamObserver.onCompleted();
+    }
+
+    @Override
+    public void search(communication.SearchAccommodationDto searchAccommodationDto, StreamObserver<communication.ListAccommodation> responseStreamObserver) {
+        AccommodationSearchDto dto = AccommodationSearchDto.builder()
+                .location(searchAccommodationDto.getLocation())
+                .guestCount(searchAccommodationDto.getGuestCount())
+                .start(LocalDate.of(searchAccommodationDto.getStartYear(), searchAccommodationDto.getStartMonth(), searchAccommodationDto.getStartDay()))
+                .end(LocalDate.of(searchAccommodationDto.getEndYear(), searchAccommodationDto.getEndMonth(), searchAccommodationDto.getEndDay()))
+                .build();
+        var accommodations = accommodationService.search(dto);
+        List<communication.AccommodationFull> accommodationFulls = new ArrayList<>();
         for (Accommodation a: accommodations) {
             accommodationFulls.add(convertAccommodationToAccommodationGrpc(a));
         }

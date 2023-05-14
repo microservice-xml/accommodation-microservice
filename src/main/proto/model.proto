@@ -10,6 +10,23 @@ service AccommodationService {
   rpc getReservation(UserIdRequest) returns (BooleanResponse);
   rpc addAccommodation(AccommodationFull) returns (MessageResponse);
   rpc addAccommodationToReservation(AccommodationRes) returns (MessageResponse);
+  rpc checkForDelete(CheckDeleteRequest) returns (BooleanResponse);
+  rpc search(SearchAccommodationDto) returns (ListAccommodation);
+}
+
+message SearchAccommodationDto {
+  string location = 1;
+  int32 startYear = 2;
+  int32 startMonth = 3;
+  int32 startDay = 4;
+  int32 endYear = 5;
+  int32 endMonth = 6;
+  int32 endDay = 7;
+  int32 guestCount = 8;
+}
+
+service UserAccommodationService {
+  rpc checkForDelete(UserIdRequest) returns (BooleanResponse);
 }
 
 message SearchRequest {
@@ -24,6 +41,13 @@ message SearchRequest {
 
 message SearchResponse {
   repeated int64 accommodationIds = 1;
+}
+
+message CheckDeleteRequest {
+  repeated int64 accommodationIds = 1;
+  int32 startYear = 2;
+  int32 startMonth = 3;
+  int32 startDay = 4;
 }
 
 message UserId {
@@ -64,3 +88,6 @@ message UserIdRequest {
 message MessageResponse {
   string message = 1;
 }
+
+
+
