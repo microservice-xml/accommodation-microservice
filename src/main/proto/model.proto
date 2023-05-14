@@ -7,6 +7,8 @@ import "google/protobuf/timestamp.proto";
 service AccommodationService {
   rpc searchByAvailabilityRange(SearchRequest) returns (SearchResponse);
   rpc findAllByUser(UserId) returns (ListAccommodation);
+  rpc getReservation(UserIdRequest) returns (BooleanResponse);
+  rpc addAccommodation(AccommodationFull) returns (MessageResponse);
 }
 
 message SearchRequest {
@@ -43,4 +45,16 @@ message AccommodationFull {
 
 message ListAccommodation {
   repeated AccommodationFull accommodations = 1;
+}
+
+message BooleanResponse {
+  bool available = 1;
+}
+
+message UserIdRequest {
+  uint64 id = 1;
+}
+
+message MessageResponse {
+  string message = 1;
 }

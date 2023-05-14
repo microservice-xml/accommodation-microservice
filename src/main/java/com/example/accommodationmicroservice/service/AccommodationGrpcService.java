@@ -1,5 +1,6 @@
 package com.example.accommodationmicroservice.service;
 
+import com.example.accommodationmicroservice.mapper.AccommodationMapper;
 import com.example.accommodationmicroservice.model.Accommodation;
 import communication.*;
 import io.grpc.stub.StreamObserver;
@@ -27,4 +28,20 @@ public class AccommodationGrpcService extends AccommodationServiceGrpc.Accommoda
         responseStreamObserver.onNext(res);
         responseStreamObserver.onCompleted();
     }
+
+    @Override
+    public void addAccommodation(communication.AccommodationFull request,
+                                 io.grpc.stub.StreamObserver<communication.MessageResponse> responseObserver) {
+        Accommodation accommodation = AccommodationMapper.convertAccommodationGrpcToAccommodation(request);
+        Accommodation acc = accommodationService.addAccommodation(accommodation);
+        MessageResponse response;
+        if(acc!=null)
+            response = MessageResponse.newBuilder().setMessage("Accommodation created.").build();
+        else
+            response = MessageResponse.newBuilder().setMessage("Creating accommodation failed.").build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
 }
