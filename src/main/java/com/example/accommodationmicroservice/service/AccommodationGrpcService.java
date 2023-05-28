@@ -2,6 +2,7 @@ package com.example.accommodationmicroservice.service;
 
 import com.example.accommodationmicroservice.mapper.AccommodationMapper;
 import com.example.accommodationmicroservice.model.Accommodation;
+import com.google.protobuf.Empty;
 import communication.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
@@ -77,6 +78,16 @@ public class AccommodationGrpcService extends communication.AccommodationService
         MessageResponse res = blockingStub.addAccommodationToReservation(AccommodationRes.newBuilder().setAccId(acc.getId()).setCity(acc.getLocation()).build());
 
         System.out.println(res.getMessage());
+    }
+
+    @Override
+    public void sendAccommodations(communication.UserId request,
+                                   io.grpc.stub.StreamObserver<communication.ListAccommodation> responseObserver) {
+        List<Accommodation> accommodations = accommodationService.findAllByUserId(request.getUserId());
+        responseObserver.onNext(ListAccommodation.newBuilder()
+                .addAllAccommodations(AccommodationMapper.convertAccommodationsToAccommodationsGrpc(accommodations))
+                .build());
+        responseObserver.onCompleted();
     }
 
 }

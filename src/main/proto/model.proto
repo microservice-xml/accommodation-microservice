@@ -12,6 +12,7 @@ service AccommodationService {
   rpc addAccommodationToReservation(AccommodationRes) returns (MessageResponse);
   rpc checkForDelete(CheckDeleteRequest) returns (BooleanResponse);
   rpc search(SearchAccommodationDto) returns (ListAccommodation);
+  rpc sendAccommodations(UserId) returns (ListAccommodation) {}
 }
 
 message SearchAccommodationDto {
@@ -88,6 +89,8 @@ message UserIdRequest {
 message MessageResponse {
   string message = 1;
 }
+
+message Empty {}
 
 
 
