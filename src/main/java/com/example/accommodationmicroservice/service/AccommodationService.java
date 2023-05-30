@@ -94,4 +94,8 @@ public class AccommodationService {
             accommodationRepository.deleteById(accId);
         }
     }
+
+    public List<Accommodation> findAllByUserId(Long userId) {
+        return accommodationRepository.findAllByUserId(userId);
+    }
 }

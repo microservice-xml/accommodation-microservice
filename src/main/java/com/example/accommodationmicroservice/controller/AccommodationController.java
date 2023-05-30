@@ -33,4 +33,9 @@ public class AccommodationController {
     public ResponseEntity<List<Accommodation>> search(@RequestBody AccommodationSearchDto accommodationSearchDto) {
         return ResponseEntity.status(OK).body(accommodationService.search(accommodationSearchDto));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<List<Accommodation>> findAllByUserId(@PathVariable Long id) {
+        return  ResponseEntity.status(OK).body(accommodationService.findAllByUserId(id));
+    }
 }

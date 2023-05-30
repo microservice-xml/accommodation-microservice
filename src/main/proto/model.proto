@@ -12,6 +12,7 @@ service AccommodationService {
   rpc addAccommodationToReservation(AccommodationRes) returns (MessageResponse);
   rpc checkForDelete(CheckDeleteRequest) returns (BooleanResponse);
   rpc search(SearchAccommodationDto) returns (ListAccommodation);
+  rpc sendAccommodations(UserId) returns (ListAccommodation) {}
 }
 
 message SearchAccommodationDto {
@@ -87,6 +88,50 @@ message UserIdRequest {
 
 message MessageResponse {
   string message = 1;
+}
+
+message Empty {}
+
+message LongId{
+  uint64 id = 1;
+}
+
+enum ReservationStatus {
+  PENDING = 0;
+  ACCEPTED = 1;
+  DECLINED = 2;
+  CANCELED = 3;
+}
+
+message Reservation {
+  string id = 1;
+  google.protobuf.Timestamp start = 2;
+  google.protobuf.Timestamp end = 3;
+  uint64 userId = 4;
+  ReservationStatus status = 5;
+  string slotId = 6;
+  uint32 numberOfGuests = 7;
+  uint64 hostId = 8;
+}
+message ListReservation{
+  repeated Reservation reservations = 1;
+}
+
+message Rate {
+  uint64 hostId = 1;
+  uint64 guestId = 2;
+  uint32 rateValue = 3;
+  string rateDate = 4;
+  uint64 id = 5;
+}
+
+message AccommodationRate {
+  uint64 hostId = 1;
+  uint64 guestId = 2;
+  uint32 rateValue = 3;
+  string rateDate = 4;
+  uint64 id = 5;
+  uint64 accommodationId = 6;
 }
 
 

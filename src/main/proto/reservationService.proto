@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+package communication;
+import "model.proto";
+
+service AccommodationCommunicationService {
+  rpc getReservation(UserIdRequest) returns (BooleanResponse);
+}
+
+service ReservationService {
+  rpc findAllByHostId(LongId) returns (ListReservation);
+}
