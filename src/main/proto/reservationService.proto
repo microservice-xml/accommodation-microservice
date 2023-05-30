@@ -7,3 +7,7 @@ import "model.proto";
 service AccommodationCommunicationService {
   rpc getReservation(UserIdRequest) returns (BooleanResponse);
 }
+
+service ReservationService {
+  rpc findAllByHostId(LongId) returns (ListReservation);
+}
