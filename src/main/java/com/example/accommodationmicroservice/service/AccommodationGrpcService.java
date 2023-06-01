@@ -100,4 +100,12 @@ public class AccommodationGrpcService extends communication.AccommodationService
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void findById(communication.UserIdRequest request,
+                         io.grpc.stub.StreamObserver<communication.AccommodationWithGrade> responseObserver) {
+        Accommodation accommodation = accommodationService.findById(request.getId());
+        responseObserver.onNext(AccommodationMapper.convertAccommodationToAccommodationWithGradeGrpc(accommodation));
+        responseObserver.onCompleted();
+    }
+
 }

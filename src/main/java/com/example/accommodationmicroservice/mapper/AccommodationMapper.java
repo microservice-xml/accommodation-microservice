@@ -2,6 +2,7 @@ package com.example.accommodationmicroservice.mapper;
 
 import com.example.accommodationmicroservice.model.Accommodation;
 import communication.AccommodationFull;
+import communication.AccommodationWithGrade;
 import communication.ListAccommodation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,23 @@ public class AccommodationMapper {
                 .setAccommodationGradeId(accommodation.getAccommodationGradeId() == null ? 0 : accommodation.getAccommodationGradeId())
                 .setIsAuto(accommodation.isAuto())
                 .setUserId(accommodation.getUserId())
+                .build();
+    }
+
+    public static AccommodationWithGrade convertAccommodationToAccommodationWithGradeGrpc(Accommodation accommodation){
+        return AccommodationWithGrade.newBuilder()
+                .setId(accommodation.getId())
+                .setName(accommodation.getName())
+                .setLocation(accommodation.getLocation())
+                .setFacilities(accommodation.getFacilities() == null ? "" : accommodation.getFacilities())
+                .setPhoto(accommodation.getPhoto())
+                .setMinGuests(accommodation.getMinGuests())
+                .setMaxGuests(accommodation.getMaxGuests())
+                .setAvailableBeds(accommodation.getAvailableBeds())
+                .setAccommodationGradeId(accommodation.getAccommodationGradeId() == null ? 0 : accommodation.getAccommodationGradeId())
+                .setIsAuto(accommodation.isAuto())
+                .setUserId(accommodation.getUserId())
+                .setAvgGrade(accommodation.getAvgGrade())
                 .build();
     }
 

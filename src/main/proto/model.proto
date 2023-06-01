@@ -14,6 +14,7 @@ service AccommodationService {
   rpc search(SearchAccommodationDto) returns (ListAccommodation);
   rpc sendAccommodations(UserId) returns (ListAccommodation) {}
   rpc findAll(Empty) returns (ListAccommodation);
+  rpc findById(UserIdRequest) returns (AccommodationWithGrade);
 }
 
 message SearchAccommodationDto {
@@ -74,6 +75,22 @@ message AccommodationFull {
   bool isAuto = 10;
   int64 userId = 11;
 }
+
+message AccommodationWithGrade {
+  int64 id = 1;
+  string name = 2;
+  string location = 3;
+  string facilities = 4;
+  string photo = 5;
+  int32 minGuests = 6;
+  int32 maxGuests = 7;
+  int32 availableBeds = 8;
+  int64 accommodationGradeId = 9;
+  bool isAuto = 10;
+  int64 userId = 11;
+  float avgGrade = 12;
+}
+
 
 message ListAccommodation {
   repeated AccommodationFull accommodations = 1;

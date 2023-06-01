@@ -13,4 +13,6 @@ public interface RateRepository extends JpaRepository<Rate, Long> {
     List<Rate> findAllByGuestId(Long id);
 
     List<Rate> findAllByAccommodationId(Long id);
+
+    List<Rate> findAllByGuestIdAndAccommodationId(Long guestId, Long accommodationId);
 }

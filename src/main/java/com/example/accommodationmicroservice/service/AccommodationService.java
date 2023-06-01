@@ -1,6 +1,7 @@
 package com.example.accommodationmicroservice.service;
 
 import com.example.accommodationmicroservice.dto.AccommodationSearchDto;
+import com.example.accommodationmicroservice.exception.AccommodationNotFound;
 import com.example.accommodationmicroservice.model.Accommodation;
 import com.example.accommodationmicroservice.repository.AccommodationRepository;
 import communication.AccommodationServiceGrpc;
@@ -97,5 +98,9 @@ public class AccommodationService {
 
     public List<Accommodation> findAllByUserId(Long userId) {
         return accommodationRepository.findAllByUserId(userId);
+    }
+
+    public Accommodation findById(Long id) {
+        return accommodationRepository.findById(id).orElseThrow(()-> new AccommodationNotFound());
     }
 }
