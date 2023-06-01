@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.accommodationmicroservice.mapper.AccommodationMapper.convertAccommodationToAccommodationGrpc;
+import static com.example.accommodationmicroservice.mapper.AccommodationMapper.convertAccommodationsToAccommodationsGrpc;
 
 @GrpcService
 @RequiredArgsConstructor
@@ -87,6 +88,15 @@ public class AccommodationGrpcService extends communication.AccommodationService
         responseObserver.onNext(ListAccommodation.newBuilder()
                 .addAllAccommodations(AccommodationMapper.convertAccommodationsToAccommodationsGrpc(accommodations))
                 .build());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void findAll(communication.Empty request,
+                        io.grpc.stub.StreamObserver<communication.ListAccommodation> responseObserver) {
+        List<Accommodation> accommodations = accommodationService.findAll();
+        ListAccommodation accList = ListAccommodation.newBuilder().addAllAccommodations(convertAccommodationsToAccommodationsGrpc(accommodations)).build();
+        responseObserver.onNext(accList);
         responseObserver.onCompleted();
     }
 

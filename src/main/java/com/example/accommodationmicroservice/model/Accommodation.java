@@ -25,7 +25,7 @@ public class Accommodation {
     private String name;
     @Column(nullable = false)
     private String location;
-    @Column(nullable = false)
+    @Column
     private String facilities;
     @Column(nullable = false)
     private String photo;
@@ -41,4 +41,6 @@ public class Accommodation {
     private boolean isAuto;
     @Column
     private Long userId;
+
+    private float avgGrade;
 }
