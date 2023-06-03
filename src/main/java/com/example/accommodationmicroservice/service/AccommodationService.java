@@ -1,11 +1,8 @@
 package com.example.accommodationmicroservice.service;
 
 import com.example.accommodationmicroservice.dto.AccommodationSearchDto;
-<<<<<<< HEAD
 import com.example.accommodationmicroservice.event.*;
-=======
 import com.example.accommodationmicroservice.exception.AccommodationNotFound;
->>>>>>> develop
 import com.example.accommodationmicroservice.model.Accommodation;
 import com.example.accommodationmicroservice.repository.AccommodationRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
