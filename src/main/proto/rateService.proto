@@ -8,4 +8,5 @@ service rateService {
   rpc rateAccommodation(AccommodationRate) returns (MessageResponse);
   rpc changeAccommodationRate(AccommodationRate) returns (AccommodationRate);
   rpc deleteAccommodationRate(UserIdRequest) returns (AccommodationRate);
+  rpc findAllByAccommodationId(UserIdRequest) returns (ListAccommodationRate);
 }

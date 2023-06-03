@@ -31,7 +31,7 @@ public class RateService {
     }
 
     public float calculateAvgRate(Rate rate) {
-        List<Rate> rates = rateRepository.findALlByHostId(rate.getHostId());
+        List<Rate> rates = rateRepository.findAllByAccommodationId(rate.getAccommodationId());
         float sum = 0;
         for(Rate rat : rates) {
             sum+= rat.getRateValue();
@@ -84,5 +84,9 @@ public class RateService {
             return null;
         }
         return rate.get();
+    }
+
+    public List<Rate> findAllByAccommodationId(Long id) {
+        return rateRepository.findAllByAccommodationId(id);
     }
 }

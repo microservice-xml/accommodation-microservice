@@ -38,4 +38,10 @@ public class AccommodationController {
     public ResponseEntity<List<Accommodation>> findAllByUserId(@PathVariable Long id) {
         return  ResponseEntity.status(OK).body(accommodationService.findAllByUserId(id));
     }
+
+    @GetMapping("/by/{id}")
+    public ResponseEntity findById(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(accommodationService.findById(id));
+    }
+
 }

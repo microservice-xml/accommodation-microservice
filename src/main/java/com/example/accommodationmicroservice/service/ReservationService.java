@@ -49,10 +49,7 @@ public class ReservationService {
     }
 
     public boolean checkCanUserRate(Long accommodationId, Long guestId) {
-        List<Rate> rates = rateRepository.findAllByGuestId(guestId);
-        if(rates.size() > 0) {
-            return false;
-        }
-        return true;
+        List<Rate> rates = rateRepository.findAllByGuestIdAndAccommodationId(guestId, accommodationId);
+        return rates.isEmpty();
     }
 }

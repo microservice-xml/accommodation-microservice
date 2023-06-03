@@ -1,7 +1,11 @@
 package com.example.accommodationmicroservice.service;
 
 import com.example.accommodationmicroservice.dto.AccommodationSearchDto;
+<<<<<<< HEAD
 import com.example.accommodationmicroservice.event.*;
+=======
+import com.example.accommodationmicroservice.exception.AccommodationNotFound;
+>>>>>>> develop
 import com.example.accommodationmicroservice.model.Accommodation;
 import com.example.accommodationmicroservice.repository.AccommodationRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -162,7 +166,6 @@ public class AccommodationService {
     public List<Accommodation> findAllByUserId(Long userId) {
         return accommodationRepository.findAllByUserId(userId);
     }
-
     public void publishMessage(BaseEvent event){ // Assuming you have an instance of MyMessage
         try {
             String json = objectMapper.writeValueAsString(event);
@@ -172,5 +175,7 @@ public class AccommodationService {
         }
     }
 
-
+    public Accommodation findById(Long id) {
+        return accommodationRepository.findById(id).orElseThrow(()-> new AccommodationNotFound());
+    }
 }

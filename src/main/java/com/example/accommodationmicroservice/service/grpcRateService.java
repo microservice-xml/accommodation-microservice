@@ -8,6 +8,8 @@ import communication.rateServiceGrpc;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
 
+import java.util.List;
+
 import static com.example.accommodationmicroservice.mapper.RateMapper.*;
 
 @GrpcService
@@ -50,6 +52,20 @@ public class grpcRateService extends rateServiceGrpc.rateServiceImplBase{
         Rate rate = rateService.deleteAccommodationRate(request.getId());
 
         responseObserver.onNext(RateAccommodationMapper.convertFromMessageToRateWithId(rate));
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void findAllByAccommodationId(communication.UserIdRequest request,
+                                         io.grpc.stub.StreamObserver<communication.ListAccommodationRate> responseObserver) {
+        List<Rate> rates = rateService.findAllByAccommodationId(request.getId());
+
+        List<communication.AccommodationRate> convertedRates = RateAccommodationMapper.convertFromMessageListToRateWithIdList(rates);
+        communication.ListAccommodationRate.Builder listRateResponseBuilder = communication.ListAccommodationRate.newBuilder();
+        listRateResponseBuilder.addAllAccommodationRates(convertedRates);
+        communication.ListAccommodationRate listRateResponse = listRateResponseBuilder.build();
+
+        responseObserver.onNext(listRateResponse);
         responseObserver.onCompleted();
     }
 }
