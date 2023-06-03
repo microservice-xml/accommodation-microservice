@@ -2,6 +2,7 @@ package com.example.accommodationmicroservice.controller;
 
 import com.example.accommodationmicroservice.dto.AccommodationSearchDto;
 import com.example.accommodationmicroservice.model.Accommodation;
+import com.example.accommodationmicroservice.model.AccommodationDto;
 import com.example.accommodationmicroservice.service.AccommodationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class AccommodationController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<List<Accommodation>> search(@RequestBody AccommodationSearchDto accommodationSearchDto) {
+    public ResponseEntity<List<AccommodationDto>> search(@RequestBody AccommodationSearchDto accommodationSearchDto) {
         return ResponseEntity.status(OK).body(accommodationService.search(accommodationSearchDto));
     }
 

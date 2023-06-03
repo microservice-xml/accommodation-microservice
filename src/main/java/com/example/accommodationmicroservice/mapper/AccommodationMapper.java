@@ -1,6 +1,7 @@
 package com.example.accommodationmicroservice.mapper;
 
 import com.example.accommodationmicroservice.model.Accommodation;
+import com.example.accommodationmicroservice.model.AccommodationDto;
 import communication.AccommodationFull;
 import communication.AccommodationWithGrade;
 import communication.ListAccommodation;
@@ -84,6 +85,24 @@ public class AccommodationMapper {
         }
 
         return grpcAccommodations;
+    }
+
+    public static AccommodationFull convertAccommodationDtoToAccommodationGrpc(AccommodationDto accommodation){
+        return AccommodationFull.newBuilder()
+                .setId(accommodation.getId())
+                .setName(accommodation.getName())
+                .setLocation(accommodation.getLocation())
+                .setFacilities(accommodation.getFacilities() == null ? "" : accommodation.getFacilities())
+                .setPhoto(accommodation.getPhoto())
+                .setMinGuests(accommodation.getMinGuests())
+                .setMaxGuests(accommodation.getMaxGuests())
+                .setAvailableBeds(accommodation.getAvailableBeds())
+                .setAccommodationGradeId(accommodation.getAccommodationGradeId() == null ? 0 : accommodation.getAccommodationGradeId())
+                .setIsAuto(accommodation.isAuto())
+                .setUserId(accommodation.getUserId())
+                .setAvgGrade(accommodation.getAvgGrade())
+                .setPrice(accommodation.getPrice())
+                .build();
     }
 
 
