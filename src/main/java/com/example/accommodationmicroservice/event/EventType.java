@@ -1,0 +1,6 @@
+package com.example.accommodationmicroservice.event;
+
+public enum EventType {
+
+    DELETE_USER_STARTED, DELETE_ACCOMMODATION_STARTED, DELETE_ACCOMMODATION_FAILED, DELETE_SLOT_FAILED, ACCOMMODATION_DELETED, SLOTS_DELETED
+}

@@ -42,5 +42,8 @@ public class Accommodation {
     @Column
     private Long userId;
 
+    @Column
+    private boolean deleted;
+
     private float avgGrade;
 }
