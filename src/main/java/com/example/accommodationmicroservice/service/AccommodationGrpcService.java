@@ -2,6 +2,7 @@ package com.example.accommodationmicroservice.service;
 
 import com.example.accommodationmicroservice.mapper.AccommodationMapper;
 import com.example.accommodationmicroservice.model.Accommodation;
+import com.example.accommodationmicroservice.model.AccommodationDto;
 import com.google.protobuf.Empty;
 import communication.*;
 import io.grpc.ManagedChannel;
@@ -17,8 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.accommodationmicroservice.mapper.AccommodationMapper.convertAccommodationToAccommodationGrpc;
-import static com.example.accommodationmicroservice.mapper.AccommodationMapper.convertAccommodationsToAccommodationsGrpc;
+import static com.example.accommodationmicroservice.mapper.AccommodationMapper.*;
 
 @GrpcService
 @RequiredArgsConstructor
@@ -47,8 +47,8 @@ public class AccommodationGrpcService extends communication.AccommodationService
                 .build();
         var accommodations = accommodationService.search(dto);
         List<communication.AccommodationFull> accommodationFulls = new ArrayList<>();
-        for (Accommodation a: accommodations) {
-            accommodationFulls.add(convertAccommodationToAccommodationGrpc(a));
+        for (AccommodationDto a: accommodations) {
+            accommodationFulls.add(convertAccommodationDtoToAccommodationGrpc(a));
         }
         var res = communication.ListAccommodation.newBuilder().addAllAccommodations(accommodationFulls).build();
         responseStreamObserver.onNext(res);

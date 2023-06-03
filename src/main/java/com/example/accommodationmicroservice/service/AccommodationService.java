@@ -3,6 +3,7 @@ package com.example.accommodationmicroservice.service;
 import com.example.accommodationmicroservice.dto.AccommodationSearchDto;
 import com.example.accommodationmicroservice.exception.AccommodationNotFound;
 import com.example.accommodationmicroservice.model.Accommodation;
+import com.example.accommodationmicroservice.model.AccommodationDto;
 import com.example.accommodationmicroservice.repository.AccommodationRepository;
 import communication.AccommodationServiceGrpc;
 import communication.SearchRequest;
@@ -29,7 +30,7 @@ public class AccommodationService {
         return accommodationRepository.save(accommodation);
     }
 
-    public List<Accommodation> search(AccommodationSearchDto accommodationSearchDto) {
+    public List<AccommodationDto> search(AccommodationSearchDto accommodationSearchDto) {
         // fix bug where date with 1 day before is sent
         accommodationSearchDto.setStart(accommodationSearchDto.getStart().plusDays(1));
         accommodationSearchDto.setEnd(accommodationSearchDto.getEnd().plusDays(1));
@@ -55,7 +56,35 @@ public class AccommodationService {
                 .addAllAccommodationIds(accommodationIds)
                 .build();
         SearchResponse response = blockingStub.searchByAvailabilityRange(req);
-        return accommodationRepository.findAllById(response.getAccommodationIdsList());
+        var accommodationIdList = new ArrayList<Long>();
+        var responseList = response.getAccommodationsList();
+        for (var a: responseList) {
+            accommodationIdList.add(a.getId());
+        }
+        var accommodationList = accommodationRepository.findAllById(accommodationIdList);
+        var retVal = new ArrayList<AccommodationDto>();
+        for (var a: accommodationList) {
+            for (var r: responseList) {
+                if (a.getId() == r.getId()) {
+                    retVal.add(AccommodationDto.builder()
+                                    .accommodationGradeId(a.getAccommodationGradeId())
+                                    .availableBeds(a.getAvailableBeds())
+                                    .avgGrade(a.getAvgGrade())
+                                    .name(a.getName())
+                                    .photo(a.getPhoto())
+                                    .price(r.getPrice())
+                                    .minGuests(a.getMinGuests())
+                                    .maxGuests(a.getMaxGuests())
+                                    .facilities(a.getFacilities())
+                                    .id(a.getId())
+                                    .isAuto(a.isAuto())
+                                    .location(a.getLocation())
+                                    .userId(a.getUserId())
+                                    .build());
+                }
+            }
+        }
+        return retVal;
     }
 
     public List<Accommodation> findAllByUser(long userId) {
