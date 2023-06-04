@@ -1,6 +1,7 @@
 package com.example.accommodationmicroservice.service;
 
 
+import com.example.accommodationmicroservice.dto.NotificationDto;
 import com.example.accommodationmicroservice.exception.CannotRateSameHost;
 import com.example.accommodationmicroservice.exception.ThisGuestHaventReservation;
 import com.example.accommodationmicroservice.model.Accommodation;
@@ -11,7 +12,11 @@ import com.example.accommodationmicroservice.repository.RateRepository;
 import com.example.accommodationmicroservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +52,7 @@ public class RateService {
                 Accommodation accommodation = accommodationRepository.findById(rate.getAccommodationId()).get();
                 accommodation.setAvgGrade(calculateAvgRate(rate));
                 accommodationRepository.save(accommodation);
+                createNotification(rate.getHostId(), "Someone is rated your accommodation with name "+accommodation.getName() +", current average rating that accommodation is "+accommodation.getAvgGrade());
                 return newRate;
             } else {
                 throw new ThisGuestHaventReservation();
@@ -88,5 +94,11 @@ public class RateService {
 
     public List<Rate> findAllByAccommodationId(Long id) {
         return rateRepository.findAllByAccommodationId(id);
+    }
+
+    public void createNotification(Long userId, String message) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpEntity<NotificationDto> requestBody = new HttpEntity<>(NotificationDto.builder().userId(userId).message(message).build());
+        ResponseEntity<String> response = restTemplate.exchange("http://localhost:8088/notification", HttpMethod.POST, requestBody, String.class);
     }
 }
