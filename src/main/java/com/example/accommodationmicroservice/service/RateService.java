@@ -52,7 +52,7 @@ public class RateService {
                 Accommodation accommodation = accommodationRepository.findById(rate.getAccommodationId()).get();
                 accommodation.setAvgGrade(calculateAvgRate(rate));
                 accommodationRepository.save(accommodation);
-                createNotification(rate.getHostId(), "Someone is rated your accommodation with name "+accommodation.getName() +", current average rating that accommodation is "+accommodation.getAvgGrade());
+                createNotification(rate.getHostId(), "Someone is rated your accommodation with name "+accommodation.getName() +", current average rating that accommodation is "+accommodation.getAvgGrade(),"newRateAcc");
                 return newRate;
             } else {
                 throw new ThisGuestHaventReservation();
@@ -96,9 +96,9 @@ public class RateService {
         return rateRepository.findAllByAccommodationId(id);
     }
 
-    public void createNotification(Long userId, String message) {
+    public void createNotification(Long userId, String message, String type) {
         RestTemplate restTemplate = new RestTemplate();
-        HttpEntity<NotificationDto> requestBody = new HttpEntity<>(NotificationDto.builder().userId(userId).message(message).build());
+        HttpEntity<NotificationDto> requestBody = new HttpEntity<>(NotificationDto.builder().userId(userId).type(type).message(message).build());
         ResponseEntity<String> response = restTemplate.exchange("http://localhost:8088/notification", HttpMethod.POST, requestBody, String.class);
     }
 }
