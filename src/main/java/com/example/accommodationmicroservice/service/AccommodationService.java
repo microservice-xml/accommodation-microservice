@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -38,6 +39,9 @@ public class AccommodationService {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Value("${reservation-api.grpc.address}")
+    private String reservationApiGrpcAddress;
+
     public List<Accommodation> findAll(){
         return accommodationRepository.findAll();
     }
@@ -55,7 +59,7 @@ public class AccommodationService {
         }
         var accommodationIds = accommodations.stream().map(Accommodation::getId).toList();
 
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9095)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(reservationApiGrpcAddress, 9095)
                 .usePlaintext()
                 .build();
 
@@ -99,6 +103,9 @@ public class AccommodationService {
                 }
             }
         }
+        if (channel != null && !channel.isShutdown()) {
+            channel.shutdown();
+        }
         return retVal;
     }
 
@@ -114,7 +121,7 @@ public class AccommodationService {
         }
         var accommodationIds = usersAccommodations.stream().map(Accommodation::getId).toList();
 
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9095)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(reservationApiGrpcAddress, 9095)
                 .usePlaintext()
                 .build();
         AccommodationServiceGrpc.AccommodationServiceBlockingStub blockingStub = AccommodationServiceGrpc.newBlockingStub(channel);
@@ -134,7 +141,9 @@ public class AccommodationService {
         } else {
             publishMessage(new AccommodationDeleteFailed(LocalDateTime.now(), EventType.DELETE_ACCOMMODATION_FAILED, userId));
         }
-
+        if (channel != null && !channel.isShutdown()) {
+            channel.shutdown();
+        }
         return response;
     }
 

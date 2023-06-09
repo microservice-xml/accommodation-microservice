@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  accommodation-api:
+    build: .
+    restart: always
+    ports:
+     - 8084:8084
+    environment:
+      - RESERVATION_API_GRPC_ADDRESS=reservation-api
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db-accommodation:3306/accommodationdb
+
+networks:
+  default:
+    name: local-env_default

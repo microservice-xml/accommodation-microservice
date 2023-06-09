@@ -13,6 +13,8 @@ import communication.SearchAccommodationDto;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,6 +26,16 @@ import static com.example.accommodationmicroservice.mapper.AccommodationMapper.*
 @RequiredArgsConstructor
 public class AccommodationGrpcService extends communication.AccommodationServiceGrpc.AccommodationServiceImplBase {
     private final AccommodationService accommodationService;
+
+    @Value("${reservation-api.grpc.address}")
+    private String reservationApiGrpcAddress;
+
+
+//    @Autowired
+//    public AccommodationGrpcService(@Value("${reservation-api.grpc.address}") String reservationApiGrpcAddress, AccommodationService accommodationService) {
+//        this.reservationApiGrpcAddress = reservationApiGrpcAddress;
+//        this.accommodationService = accommodationService;
+//    }
 
     @Override
     public void findAllByUser(communication.UserId userId, StreamObserver<communication.ListAccommodation> responseStreamObserver) {
@@ -72,13 +84,16 @@ public class AccommodationGrpcService extends communication.AccommodationService
     }
 
     private void sendAccommodationToReservation(Accommodation acc) {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9095)
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(reservationApiGrpcAddress, 9095)
                 .usePlaintext()
                 .build();
         AccommodationServiceGrpc.AccommodationServiceBlockingStub blockingStub =  AccommodationServiceGrpc.newBlockingStub(channel);
         MessageResponse res = blockingStub.addAccommodationToReservation(AccommodationRes.newBuilder().setAccId(acc.getId()).setCity(acc.getLocation()).build());
 
         System.out.println(res.getMessage());
+        if (channel != null && !channel.isShutdown()) {
+            channel.shutdown();
+        }
     }
 
     @Override
