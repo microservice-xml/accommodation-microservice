@@ -47,6 +47,15 @@ public class AccommodationMapper {
                 .build();
     }
 
+    public static communication.RecResponse convertToListAccommodations(List<Accommodation> accommodations) {
+        List<AccommodationWithGrade> records = new ArrayList<>();
+        for(Accommodation a : accommodations) {
+            records.add(convertAccommodationToAccommodationWithGradeGrpc(a));
+        }
+
+        return communication.RecResponse.newBuilder().addAllAccommodations(records).build();
+    }
+
     public static Accommodation convertAccommodationGrpcToAccommodation(communication.AccommodationFull accommodation){
         return Accommodation.builder()
                 .id(accommodation.getId())
