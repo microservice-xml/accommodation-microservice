@@ -3,6 +3,10 @@ services:
   accommodation-api:
     build: .
     restart: always
+    volumes:
+      - type: volume
+        source: local-env_shared
+        target: /home
     ports:
      - 8084:8084
     environment:
@@ -12,3 +16,7 @@ services:
 networks:
   default:
     name: local-env_default
+
+volumes:
+  local-env_shared:
+    external: true
