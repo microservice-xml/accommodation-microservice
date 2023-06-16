@@ -17,6 +17,8 @@ import communication.SearchResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +44,15 @@ public class AccommodationService {
     @Value("${reservation-api.grpc.address}")
     private String reservationApiGrpcAddress;
 
+    private Logger logger = LoggerFactory.getLogger(AccommodationService.class);
+
     public List<Accommodation> findAll(){
         return accommodationRepository.findAll();
     }
     public Accommodation addAccommodation(Accommodation accommodation){
-        return accommodationRepository.save(accommodation);
+        Accommodation ac = accommodationRepository.save(accommodation);
+        logger.info("Successfully created accomodation. [ID: %d]",ac.getId());
+        return ac;
     }
 
     public List<AccommodationDto> search(AccommodationSearchDto accommodationSearchDto) {
@@ -193,6 +199,7 @@ public class AccommodationService {
             Accommodation acc = accommodationRepository.findById(accId).get();
             acc.setDeleted(true);
             accommodationRepository.save(acc);
+            logger.info("Successfully remove accomodation. [ID: %d]",acc.getId());
         }
 
         publishMessage(new AccommodationDeleteStarted(LocalDateTime.now(), EventType.DELETE_ACCOMMODATION_STARTED, accommodationIds));

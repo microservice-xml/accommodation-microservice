@@ -11,6 +11,8 @@ import com.example.accommodationmicroservice.repository.AccommodationRepository;
 import com.example.accommodationmicroservice.repository.RateRepository;
 import com.example.accommodationmicroservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -28,7 +30,7 @@ public class RateService {
     RateRepository rateRepository;
     private final ReservationService reservationService;
     private final UserRepository userRepository;
-
+    private Logger logger = LoggerFactory.getLogger(RateService.class);
     private final AccommodationRepository accommodationRepository;
 
     public List<Rate> findAll() {
@@ -52,6 +54,7 @@ public class RateService {
                 Accommodation accommodation = accommodationRepository.findById(rate.getAccommodationId()).get();
                 accommodation.setAvgGrade(calculateAvgRate(rate));
                 accommodationRepository.save(accommodation);
+                logger.info("Successfully created rate for accomodation [ID: %d]", accommodation.getId());
                 createNotification(rate.getHostId(), "Someone is rated your accommodation with name "+accommodation.getName() +", current average rating that accommodation is "+accommodation.getAvgGrade(),"newRateAcc");
                 return newRate;
             } else {
@@ -68,6 +71,7 @@ public class RateService {
         Accommodation accommodation = accommodationRepository.findById(rate.getAccommodationId()).get();
         accommodation.setAvgGrade(calculateAvgRate(rate));
         accommodationRepository.save(accommodation);
+        logger.info("Successfully edit rate for accomodation [ID: %d]", accommodation.getId());
         return savingRate;
     }
 
@@ -79,6 +83,7 @@ public class RateService {
             Accommodation accommodation = accommodationRepository.findById(rate.getAccommodationId()).get();
             accommodation.setAvgGrade(calculateAvgRate(rate));
             accommodationRepository.save(accommodation);
+            logger.info("Successfully remove rate for accomodation [ID: %d]", accommodation.getId());
             return rate;
         }
         return null;
