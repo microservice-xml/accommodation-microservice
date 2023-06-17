@@ -15,6 +15,8 @@ import com.example.accommodationmicroservice.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -31,7 +33,8 @@ public class RateService {
     @Autowired
     RateRepository rateRepository;
     private final ReservationService reservationService;
-
+    private final UserRepository userRepository;
+    private Logger logger = LoggerFactory.getLogger(RateService.class);
     private final AccommodationRepository accommodationRepository;
 
     private final ObjectMapper objectMapper;
@@ -64,6 +67,7 @@ public class RateService {
                 accommodation.setAvgGrade(calculateAvgRate(rate));
                 accommodationRepository.save(accommodation);
                 publishNewRate(rate, EventType.RATE_CREATED);
+                logger.info("Successfully created rate for accomodation [ID: %d]", accommodation.getId());
                 createNotification(rate.getHostId(), "Someone is rated your accommodation with name "+accommodation.getName() +", current average rating that accommodation is "+accommodation.getAvgGrade(),"newRateAcc");
                 return newRate;
             } else {
@@ -94,6 +98,7 @@ public class RateService {
         accommodation.setAvgGrade(calculateAvgRate(rate));
         accommodationRepository.save(accommodation);
         publishNewRate(rate, EventType.RATE_CHANGED);
+        logger.info("Successfully edit rate for accomodation [ID: %d]", accommodation.getId());
         return savingRate;
     }
 
@@ -106,6 +111,7 @@ public class RateService {
             accommodation.setAvgGrade(calculateAvgRate(rate));
             accommodationRepository.save(accommodation);
             publishNewRate(rate, EventType.RATE_DELETED);
+            logger.info("Successfully remove rate for accomodation [ID: %d]", accommodation.getId());
             return rate;
         }
         return null;
