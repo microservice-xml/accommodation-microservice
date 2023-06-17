@@ -1,17 +1,19 @@
 package com.example.accommodationmicroservice.service;
 
 import com.example.accommodationmicroservice.dto.AccommodationSearchDto;
+import com.example.accommodationmicroservice.dto.messages.AccommodationCreateFailedMessage;
+import com.example.accommodationmicroservice.dto.messages.NewAccommodationMessage;
 import com.example.accommodationmicroservice.event.*;
 import com.example.accommodationmicroservice.exception.AccommodationNotFound;
 import com.example.accommodationmicroservice.model.Accommodation;
 import com.example.accommodationmicroservice.model.AccommodationDto;
 import com.example.accommodationmicroservice.repository.AccommodationRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import communication.*;
 import communication.AccommodationServiceGrpc;
+import communication.RecommendationServiceGrpc;
 import communication.SearchRequest;
 import communication.SearchResponse;
 import io.grpc.ManagedChannel;
@@ -43,16 +45,44 @@ public class AccommodationService {
 
     @Value("${reservation-api.grpc.address}")
     private String reservationApiGrpcAddress;
-
+    @Value("${recommendation-api.grpc.address}")
+    private String recommendationApiGrpcAddress;
     private Logger logger = LoggerFactory.getLogger(AccommodationService.class);
 
     public List<Accommodation> findAll(){
         return accommodationRepository.findAll();
     }
     public Accommodation addAccommodation(Accommodation accommodation){
-        Accommodation ac = accommodationRepository.save(accommodation);
-        logger.info("Successfully created accomodation. [ID: %d]",ac.getId());
-        return ac;
+        try {
+            Accommodation newAccommodation = accommodationRepository.save(accommodation);
+            publishNewAccommodation(newAccommodation);
+            logger.info("Successfully created accomodation. [ID: %d]",newAccommodation.getId());
+            return newAccommodation;
+        } catch (Exception e) {
+            publishRollback(accommodation.getName());
+            return null;
+        }
+
+    }
+
+    private void publishNewAccommodation(Accommodation accommodation) {
+        try {
+            NewAccommodationMessage message = new NewAccommodationMessage(accommodation.getId(), accommodation.getName());
+            String json = objectMapper.writeValueAsString(message);
+            rabbitTemplate.convertAndSend("recommendationQueue", json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void publishRollback(String name) {
+        try {
+            AccommodationCreateFailedMessage message = new AccommodationCreateFailedMessage(name);
+            String json = objectMapper.writeValueAsString(message);
+            rabbitTemplate.convertAndSend("recommendationQueue", json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public List<AccommodationDto> search(AccommodationSearchDto accommodationSearchDto) {
@@ -219,5 +249,16 @@ public class AccommodationService {
 
     public Accommodation findById(Long id) {
         return accommodationRepository.findById(id).orElseThrow(()-> new AccommodationNotFound());
+    }
+
+    public List<Accommodation> recommend(long userId) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(recommendationApiGrpcAddress, 9114)
+                .usePlaintext()
+                .build();
+        RecommendationServiceGrpc.RecommendationServiceBlockingStub blockingStub = RecommendationServiceGrpc.newBlockingStub(channel);
+        communication.RecommendationRequest userIdRequest = communication.RecommendationRequest.newBuilder().setUserId(userId).build();
+        communication.RecommendationResponse response = blockingStub.recommend(userIdRequest);
+
+        return accommodationRepository.findByIdIn(response.getAccommodationIdsList());
     }
 }

@@ -15,6 +15,7 @@ service AccommodationService {
   rpc sendAccommodations(UserId) returns (ListAccommodation) {}
   rpc findAll(Empty) returns (ListAccommodation);
   rpc findById(UserIdRequest) returns (AccommodationWithGrade);
+  rpc recommend(UserId) returns (RecResponse);
 }
 
 message SearchAccommodationDto {
@@ -98,6 +99,10 @@ message AccommodationWithGrade {
   float avgGrade = 12;
 }
 
+message RecResponse {
+  repeated AccommodationWithGrade accommodations = 1;
+}
+
 
 message ListAccommodation {
   repeated AccommodationFull accommodations = 1;
@@ -161,6 +166,18 @@ message AccommodationRate {
 
 message ListAccommodationRate{
   repeated AccommodationRate accommodationRates = 1;
+}
+
+service RecommendationService {
+  rpc recommend(RecommendationRequest) returns (RecommendationResponse);
+}
+
+message RecommendationResponse {
+  repeated int64 accommodationIds = 1;
+}
+
+message RecommendationRequest {
+  int64 userId = 1;
 }
 
 

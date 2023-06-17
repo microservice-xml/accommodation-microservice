@@ -2,6 +2,8 @@ package com.example.accommodationmicroservice.service;
 
 
 import com.example.accommodationmicroservice.dto.NotificationDto;
+import com.example.accommodationmicroservice.dto.messages.RateMessage;
+import com.example.accommodationmicroservice.event.EventType;
 import com.example.accommodationmicroservice.exception.CannotRateSameHost;
 import com.example.accommodationmicroservice.exception.ThisGuestHaventReservation;
 import com.example.accommodationmicroservice.model.Accommodation;
@@ -10,7 +12,9 @@ import com.example.accommodationmicroservice.model.User;
 import com.example.accommodationmicroservice.repository.AccommodationRepository;
 import com.example.accommodationmicroservice.repository.RateRepository;
 import com.example.accommodationmicroservice.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +37,20 @@ public class RateService {
     private Logger logger = LoggerFactory.getLogger(RateService.class);
     private final AccommodationRepository accommodationRepository;
 
+    private final ObjectMapper objectMapper;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     public List<Rate> findAll() {
         return rateRepository.findAll();
     }
 
     public float calculateAvgRate(Rate rate) {
         List<Rate> rates = rateRepository.findAllByAccommodationId(rate.getAccommodationId());
+        if (rates.size() == 0) {
+            return 0;
+        }
         float sum = 0;
         for(Rate rat : rates) {
             sum+= rat.getRateValue();
@@ -54,6 +66,7 @@ public class RateService {
                 Accommodation accommodation = accommodationRepository.findById(rate.getAccommodationId()).get();
                 accommodation.setAvgGrade(calculateAvgRate(rate));
                 accommodationRepository.save(accommodation);
+                publishNewRate(rate, EventType.RATE_CREATED);
                 logger.info("Successfully created rate for accomodation [ID: %d]", accommodation.getId());
                 createNotification(rate.getHostId(), "Someone is rated your accommodation with name "+accommodation.getName() +", current average rating that accommodation is "+accommodation.getAvgGrade(),"newRateAcc");
                 return newRate;
@@ -64,6 +77,19 @@ public class RateService {
         throw new CannotRateSameHost();
     }
 
+    public void publishNewRate(Rate rate, EventType type) {
+        try {
+            String json = objectMapper.writeValueAsString(createRateMessage(rate, type));
+            rabbitTemplate.convertAndSend("recommendationQueue", json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public RateMessage createRateMessage(Rate rate, EventType type){
+        return new RateMessage(rate, type);
+    }
+
     public Rate changeAccommodationRate(Rate rate) {
         Optional<Rate> newRate = rateRepository.findById(rate.getId());
         newRate.get().setRateValue(rate.getRateValue());
@@ -71,6 +97,7 @@ public class RateService {
         Accommodation accommodation = accommodationRepository.findById(rate.getAccommodationId()).get();
         accommodation.setAvgGrade(calculateAvgRate(rate));
         accommodationRepository.save(accommodation);
+        publishNewRate(rate, EventType.RATE_CHANGED);
         logger.info("Successfully edit rate for accomodation [ID: %d]", accommodation.getId());
         return savingRate;
     }
@@ -83,6 +110,7 @@ public class RateService {
             Accommodation accommodation = accommodationRepository.findById(rate.getAccommodationId()).get();
             accommodation.setAvgGrade(calculateAvgRate(rate));
             accommodationRepository.save(accommodation);
+            publishNewRate(rate, EventType.RATE_DELETED);
             logger.info("Successfully remove rate for accomodation [ID: %d]", accommodation.getId());
             return rate;
         }

@@ -123,4 +123,12 @@ public class AccommodationGrpcService extends communication.AccommodationService
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void recommend(communication.UserId request,
+                          io.grpc.stub.StreamObserver<communication.RecResponse> responseObserver){
+        List<Accommodation> accommodations = accommodationService.recommend(request.getUserId());
+        responseObserver.onNext(AccommodationMapper.convertToListAccommodations(accommodations));
+        responseObserver.onCompleted();
+    }
+
 }
