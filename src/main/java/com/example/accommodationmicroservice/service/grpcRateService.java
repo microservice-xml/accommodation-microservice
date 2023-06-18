@@ -7,6 +7,8 @@ import communication.MessageResponse;
 import communication.rateServiceGrpc;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -20,9 +22,12 @@ public class grpcRateService extends rateServiceGrpc.rateServiceImplBase{
 
     private final RateRepository rateRepository;
 
+    private Logger logger = LoggerFactory.getLogger(grpcRateService.class);
+
     @Override
     public void rateAccommodation(communication.AccommodationRate request,
                                   io.grpc.stub.StreamObserver<communication.MessageResponse> responseObserver) {
+        logger.trace("Request to rate the accommodation with id {} with grade {} was made", request.getAccommodationId(), request.getRateValue());
         Rate rate = RateAccommodationMapper.convertRateRequestToEntity(request);
         Rate r = rateService.rateAccommodation(rate);
 
@@ -40,6 +45,7 @@ public class grpcRateService extends rateServiceGrpc.rateServiceImplBase{
     @Override
     public void changeAccommodationRate(communication.AccommodationRate request,
                                         io.grpc.stub.StreamObserver<communication.AccommodationRate> responseObserver) {
+        logger.trace("Request to edit the rating for accommodation with id {} with new grade {} was made", request.getAccommodationId(), request.getRateValue());
         Rate rate = RateAccommodationMapper.convertRateRequestToEntityWithId(request);
         Rate r = rateService.changeAccommodationRate(rate);
 
@@ -49,6 +55,7 @@ public class grpcRateService extends rateServiceGrpc.rateServiceImplBase{
     @Override
     public void deleteAccommodationRate(communication.UserIdRequest request,
                                         io.grpc.stub.StreamObserver<communication.AccommodationRate> responseObserver) {
+        logger.trace("Request to delete the accommodation rating with id {} was made", request.getId());
         Rate rate = rateService.deleteAccommodationRate(request.getId());
 
         responseObserver.onNext(RateAccommodationMapper.convertFromMessageToRateWithId(rate));
@@ -58,6 +65,7 @@ public class grpcRateService extends rateServiceGrpc.rateServiceImplBase{
     @Override
     public void findAllByAccommodationId(communication.UserIdRequest request,
                                          io.grpc.stub.StreamObserver<communication.ListAccommodationRate> responseObserver) {
+        logger.trace("Request to find all ratings for accommodation with id {} was made", request.getId());
         List<Rate> rates = rateService.findAllByAccommodationId(request.getId());
 
         List<communication.AccommodationRate> convertedRates = RateAccommodationMapper.convertFromMessageListToRateWithIdList(rates);
