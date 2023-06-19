@@ -30,7 +30,11 @@ message SearchAccommodationDto {
 }
 
 service UserAccommodationService {
-  rpc checkForDelete(UserIdRequest) returns (BooleanResponse);
+  rpc checkForDelete(UserIdRequest) returns (AccommodationResponse);
+}
+
+message AccommodationResponse {
+  repeated int64 accommodationIds = 1;
 }
 
 message SearchRequest {

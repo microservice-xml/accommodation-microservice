@@ -13,7 +13,7 @@ public class UserAccommodationGrpcService extends communication.UserAccommodatio
 
     @Override
     public void checkForDelete(communication.UserIdRequest request,
-                               io.grpc.stub.StreamObserver<communication.BooleanResponse> responseObserver) {
+                               io.grpc.stub.StreamObserver<communication.AccommodationResponse> responseObserver) {
         logger.trace("Request to check if user with id {} can be deleted was made", request.getId());
         responseObserver.onNext(accommodationService.CheckForDelete(request.getId()));
         responseObserver.onCompleted();

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import communication.*;
+import communication.AccommodationResponse;
 import communication.AccommodationServiceGrpc;
 import communication.RecommendationServiceGrpc;
 import communication.SearchRequest;
@@ -149,15 +150,16 @@ public class AccommodationService {
         return accommodationRepository.findAllByUserId(userId);
     }
 
-    public communication.BooleanResponse CheckForDelete(Long userId) {
+    public AccommodationResponse CheckForDelete(Long userId) {
         List<Accommodation> usersAccommodations = findAllByUser(userId);
-        if (usersAccommodations.size() == 0) {
+        var accommodationIds = usersAccommodations.stream().map(Accommodation::getId).toList();
+        return AccommodationResponse.newBuilder().addAllAccommodationIds(accommodationIds).build();
+        /*if (usersAccommodations.size() == 0) {
             publishMessage(new AccommodationDeleted(LocalDateTime.now(), EventType.ACCOMMODATION_DELETED));
             return communication.BooleanResponse.newBuilder().setAvailable(true).build();
-        }
-        var accommodationIds = usersAccommodations.stream().map(Accommodation::getId).toList();
+        }*/
 
-        ManagedChannel channel = ManagedChannelBuilder.forAddress(reservationApiGrpcAddress, 9095)
+        /*ManagedChannel channel = ManagedChannelBuilder.forAddress(reservationApiGrpcAddress, 9095)
                 .usePlaintext()
                 .build();
         AccommodationServiceGrpc.AccommodationServiceBlockingStub blockingStub = AccommodationServiceGrpc.newBlockingStub(channel);
@@ -179,8 +181,8 @@ public class AccommodationService {
         }
         if (channel != null && !channel.isShutdown()) {
             channel.shutdown();
-        }
-        return response;
+        }*/
+        //return response;
     }
 
     /*@RabbitListener(queues = {"myQueue"})
@@ -232,7 +234,7 @@ public class AccommodationService {
             logger.info("Successfully remove accomodation. [ID: %d]",acc.getId());
         }
 
-        publishMessage(new AccommodationDeleteStarted(LocalDateTime.now(), EventType.DELETE_ACCOMMODATION_STARTED, accommodationIds));
+        //publishMessage(new AccommodationDeleteStarted(LocalDateTime.now(), EventType.DELETE_ACCOMMODATION_STARTED, accommodationIds));
     }
 
     public List<Accommodation> findAllByUserId(Long userId) {
